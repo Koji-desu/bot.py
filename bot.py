@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime
+from turtle import update
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import (
     ApplicationBuilder,
@@ -12,6 +13,8 @@ import extrator
 import os
 from extensoes import db
 from models import Usuario, Aposta
+import requests
+
 
 # Comando /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -60,21 +63,23 @@ async def confirmar(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not usuario_id:
         await update.message.reply_text("⚠️ Você precisa verificar seu telefone antes de usar este comando. Use /telefone.")
         return
+
     if dados:
-        data_str = dados[0]
-        data_formatada = datetime.strptime(data_str, "%d/%m/%Y").date()
-        nova_aposta = Aposta(
-            data=data_formatada,
-            valor_aposta=dados[1],
-            retorno=dados[4],
-            odd=dados[2],
-            resultado=dados[3],
-            usuario_id=usuario_id
-        )
-        db.session.add(nova_aposta)
-        db.session.commit()
-        await update.message.reply_text("✅ Dados enviados com sucesso!")
-        context.user_data.pop("dados_pendentes", None)
+        payload = {
+            "data": datetime.strptime(dados[0], "%d/%m/%Y").date().isoformat(),
+            "valor_aposta": dados[1],
+            "odd": dados[2],
+            "resultado": dados[3],
+            "retorno": dados[4],
+            "usuario_id": usuario_id
+        }
+
+        response = requests.post("https://planilhatudo.onrender.com/api/aposta", json=payload)
+        if response.status_code == 201:
+            await update.message.reply_text("✅ Dados enviados com sucesso!")
+            context.user_data.pop("dados_pendentes", None)
+        else:
+            await update.message.reply_text("❌ Erro ao enviar os dados.")
     else:
         await update.message.reply_text("Não há dados pendentes para enviar.")
 
@@ -94,10 +99,11 @@ async def receber_telefone(update: Update, context: ContextTypes.DEFAULT_TYPE):
     contato = update.message.contact
     telefone = contato.phone_number
     print(f"📲 Telefone recebido do Telegram: {telefone}")
-    usuario = Usuario.query.filter_by(tel=telefone).first()
 
-    if usuario:
-        context.user_data["usuario_id"] = usuario.id
+    response = requests.get(f"https://planilhatudo.onrender.com/api/usuario?tel={telefone}")
+    if response.status_code == 200:
+        usuario = response.json()
+        context.user_data["usuario_id"] = usuario["id"]
         await boas_vindas(update, context, usuario)
     else:
         await update.message.reply_text("❌ Telefone não encontrado. Faça cadastro no site.")
