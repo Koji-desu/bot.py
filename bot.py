@@ -117,7 +117,7 @@ async def boas_vindas(update: Update, context: ContextTypes.DEFAULT_TYPE, usuari
 # Inicializa bot
 async def main():
     print("🔄 Iniciando bot Telegram...")
-    token = os.getenv("8491501717:AAGA_K3A4kqpvpWwvkjiMDntMGJpb0ui_E8")
+    token = "8491501717:AAGA_K3A4kqpvpWwvkjiMDntMGJpb0ui_E8"
     app = ApplicationBuilder().token(token).build()
 
     app.add_handler(CommandHandler("start", start))
