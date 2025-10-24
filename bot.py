@@ -117,7 +117,7 @@ async def boas_vindas(update: Update, context: ContextTypes.DEFAULT_TYPE, usuari
 # Inicializa bot
 async def main():
     print("🔄 Iniciando bot Telegram...")
-    token = "8491501717:AAGA_K3A4kqpvpWwvkjiMDntMGJpb0ui_E8"
+    token = "8491501717:AAGA_K3A4kqpvpWwvkjiMDntMGJpb0ui_E8" # Recomendo usar variável de ambiente
     app = ApplicationBuilder().token(token).build()
 
     app.add_handler(CommandHandler("start", start))
@@ -129,10 +129,9 @@ async def main():
 
     await app.run_polling()
 
+# Executa com loop compatível
 import nest_asyncio
-import asyncio
-
 nest_asyncio.apply()
 
-if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(main())
+loop = asyncio.get_event_loop()
+loop.run_until_complete(main())
