@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime
+from fastapi import logger
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import (
     ApplicationBuilder,
@@ -78,8 +79,10 @@ async def confirmar(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("✅ Dados enviados com sucesso!")
             context.user_data.pop("dados_pendentes", None)
         else:
-                print("Status code:", response.status_code)
-                print("Resposta:", response.text)
+                logger.error("❌ Erro ao enviar os dados:")
+                logger.error("Status code: %s", response.status_code)
+                logger.error("Resposta: %s", response.text)
+
                 await update.message.reply_text("❌ Erro ao enviar os dados.")
     else:
         await update.message.reply_text("Não há dados pendentes para enviar.")
