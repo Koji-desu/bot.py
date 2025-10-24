@@ -1,6 +1,6 @@
 import asyncio
 from datetime import datetime
-from fastapi import logger
+import logging
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import (
     ApplicationBuilder,
@@ -15,6 +15,8 @@ from extensoes import db
 from models import Usuario, Aposta
 import requests
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Comando /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
