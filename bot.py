@@ -78,7 +78,9 @@ async def confirmar(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("✅ Dados enviados com sucesso!")
             context.user_data.pop("dados_pendentes", None)
         else:
-            await update.message.reply_text("❌ Erro ao enviar os dados.")
+                print("Status code:", response.status_code)
+                print("Resposta:", response.text)
+                await update.message.reply_text("❌ Erro ao enviar os dados.")
     else:
         await update.message.reply_text("Não há dados pendentes para enviar.")
 
@@ -110,7 +112,7 @@ async def receber_telefone(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # Mensagem de boas-vindas
 async def boas_vindas(update: Update, context: ContextTypes.DEFAULT_TYPE, usuario):
     mensagem = (
-        f"👋 Olá, {usuario.nome}!\n\n"
+        f"👋 Olá, {usuario['nome']}!\n\n"
         "Seja bem-vindo de volta ao nosso sistema de apostas. 🎯\n"
         "Você já pode enviar uma imagem da sua aposta para que eu extraia os dados automaticamente.\n\n"
         "📌 Lembre-se: após o processamento, use /confirmar para salvar na planilha e no sistema.\n"
